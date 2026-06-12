@@ -1,5 +1,5 @@
 # MarketLens Devlog
-Last updated: 10/06/2026
+Last updated: 12/06/2026
 
 ### What is MarketLens?
 An AI research assistant that answers natural-language questions about public companies using their SEC filings, with citations and honest refusal when the answer is not in the source.
@@ -9,12 +9,55 @@ This log tracks the engineering decisions, problems, and lessons behind the buil
 Entries are newest first.
 
 ---
+## Reading full 10-k with size based chunking
+**Entry Date:** 11/06/2026
 
-## Building a working RAG pipeline from scratch
-**Entry Date:** 2026-06-09
+### Goals
+- Get metadata and text for the full-length 10-K, and chunk it based on size limits instead of arbitrary line breaks
+- Persist chunks and metadata in a local chromadb instance, so that tokens are more efficiently used for retrieval and generation
+- Query from persistent chromadb to ask more in-depth questions
 
-### Goal
-Set up the core of the system and prompt a natural language question about a public company's risk factors. AI will reply with answers only from the source provided and  cites from source. It will refuse to answer when source does not provide relevant details and not hallucinate unreliable/ fake answers.
+### Implementations
+A full 10-K read, chunk based on size limits and query from persistent chromadb:
+- Requests to SEC EDGAR API to get metadata and text for full-length 10-K
+- Stored chromadb index locally
+- Query from chromadb with more in-depth questions about 10-K with increased chunk size to capture more context
+
+### Decisions & Tradeoffs
+- **Size-based chunking over line-based.** Line breaks in the raw text file were arbitrary and often split important context. Size-based chunking ensures that each chunk has enough content to be meaningful for retrieval, even if it means some overlap and redundancy
+- **Local chromadb for persistencee.** Allows for faster retrieval and iteration during development without the overhead of setting up a hosted vector database. It also makes it easier to inspect the indexed data and debug retrieval issues
+- **Increased chunk size.** Larger chunks capture more context, which can improve retrieval relevance, but also means fewer total chunks and potentially less granularity.
+- **Balancing retrieval precision and generation quality.** Larger chunks can improve retrieval relevance, but may also include more irrelevant information, which can make it harder for the model to generate focused answers
+
+### Challenges Faced
+- **Parsing and cleaning the full 10-K text.** The raw text from the SEC EDGAR API includes a lot of boilerplate, formatting artifacts, and non-content sections. Cleaning this data to extract meaningful chunks was a significant challenge, requiring careful handling of section headers, footnotes, and other non-content elements
+- **Chunking strategy.** Finding the right balance between chunk size and overlap was tricky. Too small chunks led to loss of context, while too large chunks made retrieval less precise and increased token usage during generation
+- **Retrieval relevance.** Ensuring that the retrieved chunks were relevant to the query was a challenge, especially with larger chunks that contained more information. This required iterative tuning of the chunking strategy and retrieval parameters
+- **Model performance.** With larger chunks, the model had to sift through more information to generate answers, which sometimes led to less focused responses. This required careful prompt engineering to guide the model to extract relevant information from the retrieved chunks
+
+### Evaluation
+- Successfully retrieved relevant chunks for in-depth questions about the 10-K, such as specific risk factors and financial metrics, demonstrating improved retrieval relevance with size-based chunking.
+- The model was able to generate more accurate and contextually grounded answers based on the retrieved chunks, although there were still instances where the model struggled to focus on the most relevant information within larger chunks, indicating room for improvement in prompt engineering and chunking strategy
+- The local chromadb instance allowed for efficient retrieval and iteration during development, and made it easier to inspect the indexed data and debug retrieval issues
+
+### What I learned
+- Size-based chunking is more effective than line-based chunking for capturing meaningful context in documents like 10-K filings, but it requires careful tuning of chunk size and overlap to balance retrieval relevance and token usage
+- Cleaning and parsing raw text data from sources like the SEC EDGAR API is a critical step in building a RAG pipeline, as it directly impacts the quality of the indexed data and the relevance of retrieved chunks
+- Prompt engineering becomes even more important with larger chunks, as the model needs clear guidance to extract relevant information from a larger pool of content during generation
+- Local persistence with chromadb can speed up development and make it easier to debug retrieval issues, but it may not be suitable for production use, where a hosted vector database might be necessary for scalability and reliability
+
+### Next
+Build an evaluation harness and golden set of questions and answers to systematically test retrieval and generation quality.
+
+---
+
+## Building a minimal RAG pipeline from scratch
+**Entry Date:** 09/06/2026
+
+### Goals
+- Set up the core of the system and prompt a natural language question about NVDA risk factors.
+- Model will reply with answers only from the source provided and cites from it
+- Refuse to answer when source does not provide relevant details and not hallucinate unreliable/ fake answers
 
 ### Implementations
 A minimal Retrieval-Augmented Generation (RAG) pipeline over NVIDIA's 10-K risk factors:
