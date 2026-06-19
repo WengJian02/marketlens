@@ -9,7 +9,43 @@ This log tracks the engineering decisions, problems, and lessons behind the buil
 Entries are newest first.
 
 ---
-## Reading full 10-k with size based chunking
+## Implementing golden set evaluation harness for RAG pipeline
+**Entry Date:** 19/06/2026
+
+### Goals
+- Build a golden set of questions and answers to systematically test retrieval and generation quality of the RAG pipeline
+- Implement an evaluation harness to run the golden set against the RAG pipeline and report on retrieval and generation performance
+
+### Implementations
+- Created a set of 8 questions based on the NVDA 10-K risk factors *(golden_set.json)*, with corresponding expected answers and must have keywords when chunking
+- Implemented an evaluation harness that runs the golden set of questions against the RAG pipeline,
+  - For each question, the harness retrieves relevant chunks from the chromadb index and generates an answer based on the retrieved context
+  - The generated answer is compared to the expected answer from golden set
+- The harness reports on retrieval performance (whether the correct chunks were retrieved) and generation performance (whether the generated answer matches the expected answer)
+    - LLM-as-judge to evaluate the quality of the generated answers, providing for a more nuanced assessement
+
+### Decisions & Tradeoffs
+- **Limited number of golden set questions.** Allows for a focused evaluation of the RAG pipeline's ability to retrieve and generate answers, but may not cover all possible questions or scenarios
+- **LLM-as-judge for evaluation.** Using an LLM to evaluate the quality of generated answers may introduce some subjectivity and variability
+
+### Challenges Faced
+- **Creating a representative golden set.** Ensuring that the golden set of questions and answers is representative of the types of questions users may ask and covers a range of difficulty levels was a challenge, requiring careful crafting and validation of the questions and expected answers
+- **Trial and Error for number of chunks being used.** Choosing the right number of chunks to obtain the max possible number of right chunks, correct answers and proper refusal was time consuming and inefficient.
+
+### Evaluation
+- Evaluation harness successfully ran the golden set of questions against the RAG pipeline and provided feedback on chunk retrieval that hit/ miss, answers that were graded correctly by the LLM and refusals that were handled honestly
+- Increasing the number of chunks to use resulted in an increase of answers being graded correctly by the LLM
+
+### What I learned
+- Building a golden set of questions and answers is essential for systematically evaluating the performance of a RAG pipeline, but it requires careful crafting and validation to ensure that it is representative and covers a range of difficulty levels
+- Evaluating retrieval and generation performance requires careful analysis and consideration of the retrieved context  and the expected answers, and may require manual inspection and iterative refinement of the evaluation criteria and process
+- Using an LLM as a judge for evaluation can provide valuable insights into the quality of generated answers and citations, but it may also introduce some subjectivity and variability in the evaluation, which should be taken into account when interpreting the results
+
+### Next
+Trial and error to find the best chunk size is inefficient, work on a diagnosing tool to find out what is causing the incorrect chunking.
+
+---
+## Reading full 10-k with size based chunking and persistent chromadb
 **Entry Date:** 11/06/2026
 
 ### Goals

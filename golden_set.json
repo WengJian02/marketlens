@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "type": "answerable",
+    "question": "How does NVIDIA describe its competition?",
+    "expected_answer": "NVIDIA expects an increasingly competitive environment and names competitors across categories: GPU/accelerated computing (AMD, Intel, Huawei), cloud companies designing their own chips (Amazon, Alphabet, Microsoft, Alibaba), Arm-based CPU suppliers, and SoC suppliers.",
+    "must_retrieve_keyword": "competit",
+    "should_refuse": false
+  },
+  {
+    "id": 2,
+    "type": "specific_fact",
+    "question": "What charge did NVIDIA take related to H20 products and export restrictions?",
+    "expected_answer": "A $4.5 billion charge in the first quarter of fiscal year 2026 for excess H20 inventory and purchase obligations after demand for H20 diminished due to licensing requirements.",
+    "must_retrieve_keyword": "H20",
+    "should_refuse": false
+  },
+  {
+    "id": 3,
+    "type": "known_hard",
+    "question": "What impacted NVIDIA's gross margins recently?",
+    "expected_answer": "Gross margins were negatively impacted by inventory provisions, including for low-yielding Blackwell material, and by charges related to excess inventory.",
+    "must_retrieve_keyword": "gross margin",
+    "should_refuse": false
+  },
+  {
+    "id": 4,
+    "type": "answerable",
+    "question": "What did NVIDIA say about U.S. export controls affecting China?",
+    "expected_answer": "Over several years NVIDIA faced expanding export controls (Aug 2022, 2023, April 2025 H20 licensing) restricting sales of A100/H100/H20 chips to China, effectively foreclosing it from China's data center compute market.",
+    "must_retrieve_keyword": "export",
+    "should_refuse": false
+  },
+  {
+    "id": 5,
+    "type": "should_refuse",
+    "question": "What is NVIDIA's dividend payout ratio target?",
+    "expected_answer": "The filing's risk/business sections do not state a dividend payout ratio target, so the system should say it doesn't have that information.",
+    "must_retrieve_keyword": null,
+    "should_refuse": true
+  },
+  {
+    "id": 6,
+    "type": "should_refuse",
+    "question": "How many employees did NVIDIA's CEO personally hire in 2010?",
+    "expected_answer": "This is not addressed in the filing; the system should refuse rather than invent a number.",
+    "must_retrieve_keyword": null,
+    "should_refuse": true
+  },
+  {
+    "id": 7,
+    "type": "answerable",
+    "question": "What risks does NVIDIA cite around supply and manufacturing?",
+    "expected_answer": "Long manufacturing lead times, dependency on third-party suppliers/foundries, difficulty forecasting demand, product transition volatility, and inventory provisions.",
+    "must_retrieve_keyword": "supply",
+    "should_refuse": false
+  },
+  {
+    "id": 8,
+    "type": "answerable",
+    "question": "What does NVIDIA say about cybersecurity or data breach risks?",
+    "expected_answer": "Security incidents, data breaches and cyber-attacks could disrupt operations and harm its financial condition, stock price and reputation.",
+    "must_retrieve_keyword": "cyber",
+    "should_refuse": false
+  }
+]
